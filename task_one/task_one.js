@@ -73,7 +73,6 @@ const getNumOfChanges = (password) => {
     checkThriceRepeatedChar(password),
     checkNoCommonPwds(password)
   ]
-  console.log(results);
   return Math.max(...results);
 }
 

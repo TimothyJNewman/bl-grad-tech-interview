@@ -17,27 +17,37 @@ function RobotController() {
   ];
 
   // state hooks
-  const [positionDirection, setPositionDirection] = useState({ x: 0, y: 0, facing: -1 });
+  const [positionDirection, setPositionDirection] = useState({ x: -1, y: -1, facing: -1 });
   const [message, setMessage] = useState({ code: -1, text: "" });
   const [command, setCommand] = useState("");
 
-  // possible commands
+  const isInitialised = () => {
+    if (positionDirection.x === -1 || positionDirection.y === -1) {
+      return false;
+    }
+    return true;
+  }
+
+  // possible commands are place(), move(), left(), right(), report()
 
   const place = (x, y, facing) => {
     if (x >= 0 && x < sideLength && y >= 0 && y < sideLength) {
       setPositionDirection({ x: x, y: y, facing: facing });
-      setMessage({ code: 1, text: `Robot moved to (${x},${y}) and is facing ${directions[facing]}` });
     } else {
       setMessage({ code: 0, text: 'Coordinate choosen not on grid' });
     }
   }
 
   const move = () => {
+    if (!isInitialised()) {
+      return;
+    }
     let newPosition = {
       x: positionDirection.x,
       y: positionDirection.y,
       facing: positionDirection.facing
     }
+    // increment by 1 in current facing direction
     switch (positionDirection.facing) {
       case 0:
         newPosition.y++;
@@ -53,16 +63,19 @@ function RobotController() {
         break;
       default:
     }
+    // checks if move is possible
     if (newPosition.x >= 0 && newPosition.x < sideLength &&
       newPosition.y >= 0 && newPosition.y < sideLength) {
       setPositionDirection(newPosition);
-      setMessage({ code: 1, text: `Robot moved to (${newPosition.x},${newPosition.y}) and facing ${directions[newPosition.facing]}` });
     } else {
       setMessage({ code: 0, text: 'Robot falls off the grid!' });
     }
   }
 
   const left = () => {
+    if (!isInitialised()) {
+      return;
+    }
     setPositionDirection({
       x: positionDirection.x,
       y: positionDirection.y,
@@ -71,6 +84,9 @@ function RobotController() {
   }
 
   const right = () => {
+    if (!isInitialised()) {
+      return;
+    }
     setPositionDirection({
       x: positionDirection.x,
       y: positionDirection.y,
@@ -79,6 +95,9 @@ function RobotController() {
   }
 
   const report = () => {
+    if (!isInitialised()) {
+      return;
+    }
     setMessage({
       code: 1,
       text: `Robot is at (${positionDirection.x},${positionDirection.y}) and facing ${directions[positionDirection.facing]}`
@@ -170,13 +189,3 @@ function RobotController() {
 }
 
 export default RobotController;
-
-/*
-Limitions to input:
-
-  - Input is assumed to be a recognised command
-
-  - For the place command, there must be a space between arguments,
-  facing direction must be all caps and facing direction must have single quotes
-
-*/
